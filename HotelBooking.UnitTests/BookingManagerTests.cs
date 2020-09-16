@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using HotelBooking.Core;
 using HotelBooking.UnitTests.Fakes;
 using Xunit;
@@ -17,23 +19,57 @@ namespace HotelBooking.UnitTests
             bookingManager = new BookingManager(bookingRepository, roomRepository);
         }
 
-        [Fact]
-        public void FindAvailableRoom_StartDateNotInTheFuture_ThrowsArgumentException()
+        public static IEnumerable<object[]> GetData_StartDateNotInTheFuture_ThrowsArgumentException()
         {
-            DateTime date = DateTime.Today;
-            Assert.Throws<ArgumentException>(() => bookingManager.FindAvailableRoom(date, date));
+            var data = new List<object[]>
+            {
+                new object[] { DateTime.Today, DateTime.Today },
+                new object[] { DateTime.Today.AddDays(-5), DateTime.Today }
+            };
+            return data;
         }
 
-        [Fact]
-        public void FindAvailableRoom_RoomAvailable_RoomIdNotMinusOne()
+        public static IEnumerable<object[]> GetData_StartDateLaterThanTheEndDate_ThrowsArgumentException()
         {
-            // Arrange
-            DateTime date = DateTime.Today.AddDays(1);
+            var data = new List<object[]>
+            {
+                new object[] { DateTime.Today, DateTime.Today.AddDays(-5) },
+                new object[] { DateTime.Today.AddDays(5), DateTime.Today }
+            };
+            return data;
+        }
+
+        public static IEnumerable<object[]> GetData_RoomAvailable_RoomIdNotMinusOne()
+        {
+            var data = new List<object[]>
+            {
+                new object[] { DateTime.Today.AddDays(1), DateTime.Today.AddDays(1) },
+                new object[] { DateTime.Today.AddDays(5), DateTime.Today.AddDays(9) },
+                new object[] { DateTime.Today.AddDays(21), DateTime.Today.AddDays(21) },
+                new object[] { DateTime.Today.AddDays(22), DateTime.Today.AddDays(30) }
+            };
+            return data;
+        }
+
+        [Theory, MemberData(nameof(GetData_StartDateNotInTheFuture_ThrowsArgumentException))]
+        public void FindAvailableRoom_StartDateNotInTheFuture_ThrowsArgumentException(DateTime start, DateTime end)
+        {
+            Assert.Throws<ArgumentException>(() => bookingManager.FindAvailableRoom(start, end));
+        }
+
+        [Theory, MemberData(nameof(GetData_StartDateNotInTheFuture_ThrowsArgumentException))]
+        public void FindAvailableRoom_StartDateLaterThanTheEndDate_ThrowsArgumentException(DateTime start, DateTime end)
+        {
+            Assert.Throws<ArgumentException>(() => bookingManager.FindAvailableRoom(start, end));
+        }
+
+        [Theory, MemberData(nameof(GetData_RoomAvailable_RoomIdNotMinusOne))]
+        public void FindAvailableRoom_RoomAvailable_RoomIdNotMinusOne(DateTime start, DateTime end)
+        {
             // Act
-            int roomId = bookingManager.FindAvailableRoom(date, date);
+            int roomId = bookingManager.FindAvailableRoom(start, end);
             // Assert
             Assert.NotEqual(-1, roomId);
         }
-
     }
 }
