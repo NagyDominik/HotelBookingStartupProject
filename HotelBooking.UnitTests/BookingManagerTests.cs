@@ -19,6 +19,8 @@ namespace HotelBooking.UnitTests
             bookingManager = new BookingManager(bookingRepository, roomRepository);
         }
 
+        #region Member data for FindAvailableRoom() tests
+
         public static IEnumerable<object[]> GetData_StartDateAndEndDateCorrectButOverlapsExistingBooking()
         {
             var data = new List<object[]>
@@ -106,6 +108,28 @@ namespace HotelBooking.UnitTests
             return data;
         }
 
+        #endregion
+
+        #region Member data for GetFullyOccupiedDates() tests
+
+        public static IEnumerable<object[]> GetData_StartDateLaterThanEndDate()
+        {
+            var data = new List<object[]>
+            {
+                new object[] {DateTime.Today.AddDays(5), DateTime.Today.AddDays(2)},
+                new object[] {DateTime.Today.AddDays(4), DateTime.Today.AddDays(2)},
+                new object[] {DateTime.Today.AddDays(2), DateTime.Today.AddDays(1)},
+                new object[] {DateTime.Today.AddDays(10), DateTime.Today.AddDays(9)},
+                new object[] {DateTime.Today.AddDays(11), DateTime.Today.AddDays(8)},
+            };
+
+            return data;
+        }
+
+        #endregion
+
+        #region Tests for FindAvailableRoom
+
         [Theory, MemberData(nameof(GetData_StartDateNotInTheFuture_ThrowsArgumentException))]
         public void FindAvailableRoom_StartDateNotInTheFuture_ThrowsArgumentException(DateTime start, DateTime end)
         {
@@ -138,5 +162,18 @@ namespace HotelBooking.UnitTests
 
             Assert.Equal(-1, roomId);
         }
+
+        #endregion
+
+        #region Tests for GetFullyOccupiedDates
+
+        [Theory]
+        [MemberData(nameof(GetData_StartDateLaterThanEndDate))]
+        public void GetFullyOccupideDates_StartDateLaterThanEndDate_ThrowsArgumentException(DateTime start, DateTime end)
+        {
+            Assert.Throws<ArgumentException>(() => bookingManager.GetFullyOccupiedDates(start, end));
+        }
+
+        #endregion
     }
 }
