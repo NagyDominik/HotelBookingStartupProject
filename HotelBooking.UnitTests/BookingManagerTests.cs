@@ -129,34 +129,10 @@ namespace HotelBooking.UnitTests
 
         [Theory]
         [MemberData(nameof(GetData_StartDateAndEndDateCorrectButOverlapsExistingBooking))]
-        public void FindAvailableRoom_StartDateAndEndDateCorrectButOverlapsExistingBooking_RoomIDMinusOne(DateTime start, DateTime end)
-        {
-            int roomId = bookingManager.FindAvailableRoom(start, end);
-
-            Assert.Equal(-1, roomId);
-        }
-
-        [Theory]
         [MemberData(nameof(GetData_StartDateCorrectEndDateOverlapsExistingBooking))]
-        public void FindAvailableRoom_StartDateCorrectEndDateOverlapsExistingBooking_RoomIDMinusOne(DateTime start, DateTime end)
-        {
-            int roomId = bookingManager.FindAvailableRoom(start, end);
-
-            Assert.Equal(-1, roomId);
-        }
-
-        [Theory]
         [MemberData(nameof(GetData_StartDateOverlapsExistingBookingEndDateCorrect))]
-        public void FindAvailableRoom_StartDateOverlapsExistingBookingEndDateCorrect_RoomIDMinusOne(DateTime start, DateTime end)
-        {
-            int roomId = bookingManager.FindAvailableRoom(start, end);
-
-            Assert.Equal(-1, roomId);
-        }
-
-        [Theory]
         [MemberData(nameof(GetData_StartDateAndEndDateOverlapsExistingBooking))]
-        public void FindAvailableRoom_StartDateAndEndDateOverlapsExistingBooking_RoomIDMinusOne(DateTime start, DateTime end)
+        public void FindAvailableRoom_RoomNotAvailable_RoomIdMinusOne(DateTime start, DateTime end)
         {
             int roomId = bookingManager.FindAvailableRoom(start, end);
 
