@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using HotelBooking.Core;
 using HotelBooking.UnitTests.Fakes;
+using HotelBooking.UnitTests.TestData;
 using Moq;
 using Xunit;
 
@@ -51,130 +52,21 @@ namespace HotelBooking.UnitTests
             bookingManager = new BookingManager(fakeBookingRepository.Object, fakeRoomRepository.Object);
         }
 
-        #region Member data for FindAvailableRoom() tests
-
-        public static IEnumerable<object[]> GetData_StartDateAndEndDateCorrectButOverlapsExistingBooking()
-        {
-            var data = new List<object[]>
-            {
-                new object[] {DateTime.Today.AddDays(1), DateTime.Today.AddDays(30)},
-                new object[] {DateTime.Today.AddDays(2), DateTime.Today.AddDays(22)},
-                new object[] {DateTime.Today.AddDays(9), DateTime.Today.AddDays(41)},
-                new object[] {DateTime.Today.AddDays(5), DateTime.Today.AddDays(25)},
-                new object[] {DateTime.Today.AddDays(8), DateTime.Today.AddDays(25)}
-            };
-
-            return data;
-        }
-
-        public static IEnumerable<object[]> GetData_StartDateCorrectEndDateOverlapsExistingBooking()
-        {
-            var data = new List<object[]>
-            {
-                new object[] {DateTime.Today.AddDays(1), DateTime.Today.AddDays(11)},
-                new object[] {DateTime.Today.AddDays(2), DateTime.Today.AddDays(12)},
-                new object[] {DateTime.Today.AddDays(3), DateTime.Today.AddDays(13)},
-                new object[] {DateTime.Today.AddDays(8), DateTime.Today.AddDays(18)},
-                new object[] {DateTime.Today.AddDays(9), DateTime.Today.AddDays(20)},
-            };
-
-            return data;
-        }
-
-        public static IEnumerable<object[]> GetData_StartDateOverlapsExistingBookingEndDateCorrect()
-        {
-            var data = new List<object[]>
-            {
-                new object[] {DateTime.Today.AddDays(11), DateTime.Today.AddDays(21)},
-                new object[] {DateTime.Today.AddDays(12), DateTime.Today.AddDays(22)},
-                new object[] {DateTime.Today.AddDays(13), DateTime.Today.AddDays(23)},
-                new object[] {DateTime.Today.AddDays(18), DateTime.Today.AddDays(40)},
-                new object[] {DateTime.Today.AddDays(19), DateTime.Today.AddDays(50)}
-            };
-
-            return data;
-        }
-
-        public static IEnumerable<object[]> GetData_StartDateAndEndDateOverlapsExistingBooking()
-        {
-            var data = new List<object[]>
-            {
-                new object[] {DateTime.Today.AddDays(10), DateTime.Today.AddDays(11)},
-                new object[] {DateTime.Today.AddDays(11), DateTime.Today.AddDays(12)},
-                new object[] {DateTime.Today.AddDays(12), DateTime.Today.AddDays(14)},
-                new object[] {DateTime.Today.AddDays(19), DateTime.Today.AddDays(19)},
-                new object[] {DateTime.Today.AddDays(20), DateTime.Today.AddDays(20)}
-            };
-
-            return data;
-        }
-        public static IEnumerable<object[]> GetData_StartDateNotInTheFuture_ThrowsArgumentException()
-        {
-            var data = new List<object[]>
-            {
-                new object[] { DateTime.Today, DateTime.Today },
-                new object[] { DateTime.Today.AddDays(-5), DateTime.Today }
-            };
-            return data;
-        }
-
-        public static IEnumerable<object[]> GetData_StartDateLaterThanTheEndDate_ThrowsArgumentException()
-        {
-            var data = new List<object[]>
-            {
-                new object[] { DateTime.Today, DateTime.Today.AddDays(-5) },
-                new object[] { DateTime.Today.AddDays(5), DateTime.Today }
-            };
-            return data;
-        }
-
-        public static IEnumerable<object[]> GetData_RoomAvailable_RoomIdNotMinusOne()
-        {
-            var data = new List<object[]>
-            {
-                new object[] { DateTime.Today.AddDays(1), DateTime.Today.AddDays(1) },
-                new object[] { DateTime.Today.AddDays(5), DateTime.Today.AddDays(9) },
-                new object[] { DateTime.Today.AddDays(21), DateTime.Today.AddDays(21) },
-                new object[] { DateTime.Today.AddDays(22), DateTime.Today.AddDays(30) }
-            };
-            return data;
-        }
-
-        #endregion
-
-        #region Member data for GetFullyOccupiedDates() tests
-
-        public static IEnumerable<object[]> GetData_StartDateLaterThanEndDate()
-        {
-            var data = new List<object[]>
-            {
-                new object[] {DateTime.Today.AddDays(5), DateTime.Today.AddDays(2)},
-                new object[] {DateTime.Today.AddDays(4), DateTime.Today.AddDays(2)},
-                new object[] {DateTime.Today.AddDays(2), DateTime.Today.AddDays(1)},
-                new object[] {DateTime.Today.AddDays(10), DateTime.Today.AddDays(9)},
-                new object[] {DateTime.Today.AddDays(11), DateTime.Today.AddDays(8)},
-            };
-
-            return data;
-        }
-
-        #endregion
-
         #region Tests for FindAvailableRoom
 
-        [Theory, MemberData(nameof(GetData_StartDateNotInTheFuture_ThrowsArgumentException))]
+        [Theory, MemberData(nameof(TestDataProvider.GetData_StartDateNotInTheFuture), MemberType = typeof(TestDataProvider))]
         public void FindAvailableRoom_StartDateNotInTheFuture_ThrowsArgumentException(DateTime start, DateTime end)
         {
             Assert.Throws<ArgumentException>(() => bookingManager.FindAvailableRoom(start, end));
         }
 
-        [Theory, MemberData(nameof(GetData_StartDateNotInTheFuture_ThrowsArgumentException))]
+        [Theory, MemberData(nameof(TestDataProvider.GetData_StartDateLaterThanEndDate), MemberType = typeof(TestDataProvider))]
         public void FindAvailableRoom_StartDateLaterThanTheEndDate_ThrowsArgumentException(DateTime start, DateTime end)
         {
             Assert.Throws<ArgumentException>(() => bookingManager.FindAvailableRoom(start, end));
         }
 
-        [Theory, MemberData(nameof(GetData_RoomAvailable_RoomIdNotMinusOne))]
+        [Theory, MemberData(nameof(TestDataProvider.GetData_RoomAvailable), MemberType = typeof(TestDataProvider))]
         public void FindAvailableRoom_RoomAvailable_RoomIdNotMinusOne(DateTime start, DateTime end)
         {
             // Act
@@ -184,10 +76,10 @@ namespace HotelBooking.UnitTests
         }
 
         [Theory]
-        [MemberData(nameof(GetData_StartDateAndEndDateCorrectButOverlapsExistingBooking))]
-        [MemberData(nameof(GetData_StartDateCorrectEndDateOverlapsExistingBooking))]
-        [MemberData(nameof(GetData_StartDateOverlapsExistingBookingEndDateCorrect))]
-        [MemberData(nameof(GetData_StartDateAndEndDateOverlapsExistingBooking))]
+        [MemberData(nameof(TestDataProvider.GetData_StartDateAndEndDateCorrectButOverlapsExistingBooking), MemberType = typeof(TestDataProvider))]
+        [MemberData(nameof(TestDataProvider.GetData_StartDateCorrectEndDateOverlapsExistingBooking), MemberType = typeof(TestDataProvider))]
+        [MemberData(nameof(TestDataProvider.GetData_StartDateOverlapsExistingBookingEndDateCorrect), MemberType = typeof(TestDataProvider))]
+        [MemberData(nameof(TestDataProvider.GetData_StartDateAndEndDateOverlapsExistingBooking), MemberType = typeof(TestDataProvider))]
         public void FindAvailableRoom_RoomNotAvailable_RoomIdMinusOne(DateTime start, DateTime end)
         {
             int roomId = bookingManager.FindAvailableRoom(start, end);
@@ -200,7 +92,7 @@ namespace HotelBooking.UnitTests
         #region Tests for GetFullyOccupiedDates
 
         [Theory]
-        [MemberData(nameof(GetData_StartDateLaterThanEndDate))]
+        [MemberData(nameof(TestDataProvider.GetData_StartDateLaterThanEndDate), MemberType = typeof(TestDataProvider))]
         public void GetFullyOccupideDates_StartDateLaterThanEndDate_ThrowsArgumentException(DateTime start, DateTime end)
         {
             Assert.Throws<ArgumentException>(() => bookingManager.GetFullyOccupiedDates(start, end));
